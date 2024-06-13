@@ -8,7 +8,7 @@ We attaches great importance to research and development, and thus independently
 
 1.Overview
 ---
-UnitreeCameraSDK 1.1.0 is a cross-platform library for unitree stereo cameras
+UnitreecameraSDK 1.1.0 is a cross-platform library for unitree stereo cameras
 
 The SDK allows depth and color streaming, and provides intrinsic calibration information. The library also offers pointcloud, depth image aligned to color image.
 
@@ -28,8 +28,38 @@ CMake, version: 2.8 or higher
 2.Build
 ---
 
+Download the source code of [opencv4.1.1](
+https://onedrive.live.com/?authkey=!AAgd-2ZcuPDFM4E&cid=CDE1BA91EFBCF992&id=CDE1BA91EFBCF992!739&parId=CDE1BA91EFBCF992!738&o=OneUp) and unzip it.
+
+First, add following line in:  `opencv-4.1.1/modules/gapi/test/gapi_async_test.cpp` 
 ```
-cd UnitreeCameraSDK;
+#include <thread>
+```
+
+Second, `sudo apt install libeigen3-dev` and change following line in: `opencv-4.1.1/modules/core/include/opencv2/core/private.hpp`
+modify this line
+```
+# include <Eigen/Core>
+```
+into
+```
+# include <eigen3/Eigen/Core>
+```
+
+Now, you can compile opencv in your machine.
+
+```
+mkdir build
+cd build
+cmake -D OPENCV_GENERATE_PKGCONFIG=YES ..
+make -j16
+sudo make install
+```
+
+After it, `sudo apt install libyaml-dev` and compile UnitreecameraSDK
+
+```
+cd UnitreecameraSDK;
 mkdir build && cd build;
 cmake ..; make
 ```
@@ -39,46 +69,97 @@ cmake ..; make
 
 Get Camera Raw Frame:
 ```
-cd UnitreeCameraSDK; 
+cd UnitreecameraSDK; 
 ./bin/example_getRawFrame 
 ```
 
 Get Calibration Parameters File
 ```
-cd UnitreeCameraSDK;
+cd UnitreecameraSDK;
 ./bin/example_getCalibParamsFile 
 ```
 
 Get Rectify Frame
 ```
-cd UnitreeCameraSDK;
+cd UnitreecameraSDK;
 ./bin/example_getRectFrame
 ```
 
 Get Depth Frame
 ```
-cd UnitreeCameraSDK;
+cd UnitreecameraSDK;
 ./bin/example_getDepthFrame
 ```
 
 Get Point Cloud:
 ```
-cd UnitreeCameraSDK; 
+cd UnitreecameraSDK; 
 ./bin/example_getPointCloud
 ```
 
-4.send image and listen image
-sender:put image to another devices
+## 4. Gstreamer Go1 camera
+
+Stop the camera-related processes that come with the board.
 ```
-cd UnitreeCameraSDK; 
+ps -aux | grep point_cloud_node | awk '{print $2}' | xargs kill -9
+ps -aux | grep mqttControlNode | awk '{print $2}' | xargs kill -9
+ps -aux | grep live_human_pose | awk '{print $2}' | xargs kill -9
+ps -aux | grep rosnode | awk '{print $2}' | xargs kill -9
+```
+
+There is shell script to executes those command easily `bash killall.sh`
+
+
+### Sender
+Default sender:put image to another devices
+```
+cd UnitreecameraSDK; 
 ./bin/example_putImagetrans
 ```
 
-listener:get image from another devices
+or advance sender: pass config .yaml as an argument and parse the important config that tuneable
 ```
-cd UnitreeCameraSDK; 
+cd UnitreecameraSDK; 
+./bin/example_putImagetransV1 trans_rect_config.yaml
+```
+Modify following configs that related to target device address, device node of camera address, and also transfering mode.
+```
+#UDP address for image transfer 192.168.123.IpLastSegment
+IpLastSegment: !!opencv-matrix
+   rows: 1
+   cols: 1
+   dt: d
+   data: [ 200. ]
+#DeviceNode
+DeviceNode: !!opencv-matrix
+   rows: 1
+   cols: 1
+   dt: d
+   data: [ 0. ]
+#0 ori img - right  1 ori img - stereo  2 rect img - right  3 rect img - stereo   -1 不传图
+Transmode: !!opencv-matrix
+   rows: 1
+   cols: 1
+   dt: d
+   data: [ 3. ] 
+```
+
+---
+### Receiver
+Default c++ listener:get image from another devices,
+```
+cd UnitreecameraSDK 
 ./bin/example_getimagetrans
 ```
 
+or the python script for get image from another devices.
+```
+cd UnitreecameraSDK/scripts/ 
+python3 example_getImagetrans.py --device 192.168.123.xx --host 920x
+```
+
+Note: using pip3 to install opencv-python and opencv-contrib-python will lack dependencies, and you must install opencv from source code
 
 
+## References
+https://unitree-docs.readthedocs.io/en/latest/get_started/Go1_Edu.html
