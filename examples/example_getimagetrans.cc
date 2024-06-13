@@ -33,21 +33,35 @@ gateway 192.168.123.1
 
 #include <opencv2/opencv.hpp>
 #include <iostream>
+
+
 int main(int argc,char** argv)
 {
-    std::string IpLastSegment = "15";
+
+#ifdef __x86_64__
+    std::cout << "Detected x86_64 architecture" << std::endl;
+    std::string udpstrBehindData = " ! application/x-rtp,media=video,encoding-name=H264 ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert ! appsink";
+#else
+    std::cout << "Not detected x86_64 architecture" << std::endl;
+    std::string udpstrBehindData = " ! application/x-rtp,media=video,encoding-name=H264 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink";
+#endif
+
+    std::string IpLastSegment = "200";
     int cam = 1;
     if (argc>=2)
         cam = std::atoi(argv[1]);
     std::string udpstrPrevData = "udpsrc address=192.168.123."+ IpLastSegment + " port=";
+
     //端口：前方，下巴，左，右，腹部
-	std::array<int,5> udpPORT = std::array<int, 5>{9201, 9202, 9203, 9204, 9205};
-    std::string udpstrBehindData = " ! application/x-rtp,media=video,encoding-name=H264 ! rtph264depay ! h264parse ! omxh264dec ! videoconvert ! appsink";
-    std::string udpSendIntegratedPipe = udpstrPrevData +  std::to_string(udpPORT[cam-1]) + udpstrBehindData;
+	std::array<int,5> udpPORT = std::array<int, 5>{9202, 9201, 9203, 9204, 9205};
+
+    std::string udpSendIntegratedPipe = udpstrPrevData +  std::to_string(udpPORT[cam]) + udpstrBehindData;
     std::cout<<"udpSendIntegratedPipe:"<<udpSendIntegratedPipe<<std::endl;
+
     cv::VideoCapture cap(udpSendIntegratedPipe);
     if(!cap.isOpened())
         return 0 ;
+
     cv::Mat frame;
     while(1)
     {
