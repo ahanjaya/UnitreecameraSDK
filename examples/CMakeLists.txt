@@ -56,11 +56,23 @@ else()
 endif()
 
 if(${ShowPointCloud})
-add_executable(example_getPointCloud ./example_getPointCloud.cc ./glViewer/glwindow_x11.cpp ./glViewer/scenewindow.cpp)
-target_link_libraries(example_getPointCloud ${SDKLIBS} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${X11_LIBRARIES} )
+    add_executable(example_getPointCloud ./example_getPointCloud.cc ./glViewer/glwindow_x11.cpp ./glViewer/scenewindow.cpp)
+    target_link_libraries(example_getPointCloud ${SDKLIBS} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${X11_LIBRARIES} )
 endif()
 
+find_package(yaml-cpp QUIET)
+if(yaml-cpp_FOUND)
+    set(YAMLCPP true)
+    include_directories(${YAML_CPP_INCLUDE_DIRS})
+    message(STATUS "yaml-cpp found: ${YAML_CPP_INCLUDE_DIR}")
+else()
+    set(YAMLCPP false)
+    message(WARNING "yaml-cpp not found")
+endif()
+
+if(${YAMLCPP})
+    add_executable(example_putImagetransV1 ./example_putImagetransV1.cc)
+    target_link_libraries(example_putImagetransV1 ${SDKLIBS} ${YAML_CPP_LIBRARIES})
+endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
-
-
