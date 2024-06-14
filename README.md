@@ -28,7 +28,7 @@ CMake, version: 2.8 or higher
 3.Build
 ---
 
-Download the source code of [opencv4.1.1](
+If you want to build on your computer, you need to compile opencv from source first. You may skip compiling OpenCV in Go1 Jetson, as it already exist.  Download the source code of [opencv4.1.1](
 https://onedrive.live.com/?authkey=!AAgd-2ZcuPDFM4E&cid=CDE1BA91EFBCF992&id=CDE1BA91EFBCF992!739&parId=CDE1BA91EFBCF992!738&o=OneUp) and unzip it.
 
 First, add following line in:  `opencv-4.1.1/modules/gapi/test/gapi_async_test.cpp` 
@@ -56,12 +56,23 @@ make -j16
 sudo make install
 ```
 
-After it, `sudo apt install libyaml-dev` and compile UnitreecameraSDK
+If you want to run UnitreecameraSDK in your robot Jetson, proceed to this step directly. Install `yaml-cpp` package first: `sudo apt install libyaml-cpp-dev`. Then, download UnitreecameraSDK from this repo.
+
+```
+git clone https://github.com/ahanjaya/UnitreecameraSDK.git
+```
+or copy from local computer to jetson nano
+```
+scp -r UnitreecameraSDK unitree@192.168.123.13:~/
+scp -r UnitreecameraSDK unitree@192.168.123.14:~/
+scp -r UnitreecameraSDK unitree@192.168.123.15:~/
+```
+Next
 
 ```
 cd UnitreecameraSDK;
 mkdir build && cd build;
-cmake ..; make
+cmake ..; make-j4
 ```
 
 4.Run Examples
@@ -144,6 +155,36 @@ Transmode: !!opencv-matrix
    dt: d
    data: [ 3. ] 
 ```
+
+or if you can follow below methods:
+
+Nano 1 (Head)
+```
+ssh unitree@192.168.123.13
+cd ~/UnitreecameraSDK/
+bash killall.sh
+./bins/example_putImagetransV1 trans_rect_config_front.yaml
+./bins/example_putImagetransV1 trans_rect_config_jaw.yaml
+```
+
+Nano 2 (Body)
+```
+ssh unitree@192.168.123.14
+cd ~/UnitreecameraSDK/
+bash killall.sh
+./bins/example_putImagetransV1 trans_rect_config_left.yaml
+./bins/example_putImagetransV1 trans_rect_config_right.yaml
+```
+
+Nano 3 (Head)
+```
+ssh unitree@192.168.123.15
+cd ~/UnitreecameraSDK/
+bash killall.sh
+./bins/example_putImagetransV1 trans_rect_config_belly.yaml
+```
+
+
 
 ---
 ### Receiver
