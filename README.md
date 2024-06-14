@@ -25,7 +25,7 @@ CMake, version: 2.8 or higher
 
 [X11], for point cloud gui 
 
-2.Build
+3.Build
 ---
 
 Download the source code of [opencv4.1.1](
@@ -64,7 +64,7 @@ mkdir build && cd build;
 cmake ..; make
 ```
 
-3.Run Examples
+4.Run Examples
 ---
 
 Get Camera Raw Frame:
@@ -97,7 +97,8 @@ cd UnitreecameraSDK;
 ./bin/example_getPointCloud
 ```
 
-## 4. Gstreamer Go1 camera
+5.Gstreamer Go1 camera
+---
 
 Stop the camera-related processes that come with the board.
 ```
@@ -160,6 +161,22 @@ python3 example_getImagetrans.py --device 192.168.123.xx --host 920x
 
 Note: using pip3 to install opencv-python and opencv-contrib-python will lack dependencies, and you must install opencv from source code
 
+6.Example Result
+---
+### Front Camera - Original Image
+<div style="text-align: center;">
+    <img src="resources/front-original.jpg" alt="Front Original" width="400"/>
+</div>
+
+### Front Camera - Rect Image
+<div style="text-align: center;">
+    <img src="resources/front-rect.jpg" alt="Front Rect" width="500"/>
+</div>
+
+### Front Camera - Depth Image
+<div style="text-align: center;">
+    <img src="resources/front-depth.jpg" alt="Front Depth" width="500"/>
+</div>
 
 ## References
 https://unitree-docs.readthedocs.io/en/latest/get_started/Go1_Edu.html
